@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- TITOLO PRINCIPALE DELLA SCHEDA -->
+    <title>Gugatti</title>
+
+    <!-- ==================================================
+         GOOGLE SEO & MOTORI DI RICERCA
+         ================================================== -->
+    <meta name="description" content="Welcome to the official home of Gugatti™! Play official free games including Gugatti Jump, Gugatti Jump 2, and Gugatti Shooter, read the latest news, and discover the Gugatti universe.">
+    <meta name="keywords" content="Gugatti, Gugatti official, Gugatti games, Gugatti Jump, Gugatti Jump 2, Gugatti Shooter, Gugatti news, pink cat mascot">
+    <meta name="author" content="Gugatti™">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    
+    <!-- OPEN GRAPH (WhatsApp, Discord, Facebook, Telegram) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Gugatti™">
+    <meta property="og:title" content="Gugatti">
+    <meta property="og:description" content="The official website of Gugatti™. Play Gugatti Jump, Gugatti Shooter, and discover the latest news!">
+    <meta property="og:image" content="big_pink.png">
+
+    <!-- TWITTER / X CARDS -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gugatti">
+    <meta name="twitter:description" content="The official website of Gugatti™. Play Gugatti Jump, Gugatti Shooter, and discover the latest news!">
+    <meta name="twitter:image" content="big_pink.png">
+
+    <!-- DATI STRUTTURATI GOOGLE (SCHEMA.ORG JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Gugatti",
+      "alternateName": ["Gugatti Official", "Gugatti Games"],
+      "url": "https://gugatti.com/",
+      "description": "The official website and online game platform of Gugatti™.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Gugatti™",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "big_pink.png"
+        }
+      }
+    }
+    </script>
+
+    <style>
+        * { box-sizing: border-box; }
+        html, body {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8eafa;
+            color: #111;
+            padding-bottom: 80px;
+        }
+        img {
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+        }
+
+        .loading-screen {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #f8eafa;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 20px; z-index: 99999;
+            transition: opacity 0.4s ease;
+        }
+        .loading-screen.fade-out { opacity: 0; pointer-events: none; }
+        .loading-cat {
+            width: 120px; height: 120px;
+            animation: spinCat 2.5s linear infinite, colorShift 0.6s linear infinite;
+        }
+        .loading-text {
+            font-family: Georgia, serif;
+            font-size: 18px; font-weight: bold;
+            color: #78328c;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes spinCat { to { transform: rotate(360deg); } }
+        @keyframes colorShift {
+            0%   { filter: hue-rotate(0deg); }
+            50%  { filter: hue-rotate(180deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .page-content { opacity: 0; transition: opacity 0.4s ease; }
+        .page-content.visible { opacity: 1; }
+
+        header {
+            width: 100%; min-height: 85px;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 8px 6%;
+            background: #f8eafa;
+            border-bottom: 1px solid #dfcce3;
+            position: relative;
+        }
+        .header-left {
+            display: flex; align-items: center; gap: 15px;
+        }
+        .header-right {
+            display: flex; align-items: center; gap: 15px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: default; }
+        .logo img { width: 65px; height: 65px; }
+        .logo-text { font-family: Georgia, serif; font-size: 34px; font-weight: bold; }
+        .logo-text sup { font-size: 13px; position: relative; top: -12px; margin-left: 2px; }
+
+        /* LANGUAGE FLAGS */
+        .lang-flags {
+            display: flex; gap: 8px; align-items: center;
+        }
+        .lang-flag {
+            width: 32px; height: 22px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            opacity: 0.4;
+            transition: opacity 0.2s, border-color 0.2s;
+            pointer-events: auto;
+            display: block;
+        }
+        .lang-flag:hover { opacity: 0.8; }
+        .lang-flag.active {
+            opacity: 1;
+            border-color: #78328c;
+        }
+
+        .nav-tabs { display: flex; gap: 12px; }
+        .nav-tab {
+            font-weight: bold; font-size: 15px;
+            cursor: pointer; padding: 9px 18px;
+            background: #f8eafa;
+            border: 2px solid #c9a8d0;
+            color: #333;
+        }
+        .nav-tab:hover { background: #f0dff3; }
+        .nav-tab.active { background: #e4c7ea; border-color: #78328c; }
+
+        .hamburger {
+            display: none;
+            width: 44px; height: 44px;
+            background: #f8eafa;
+            border: 2px solid #c9a8d0;
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 5px; padding: 0; z-index: 1001;
+        }
+        .hamburger span {
+            display: block; width: 22px; height: 2px;
+            background: #333;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%; right: 0;
+            background: #f8eafa;
+            border: 2px solid #c9a8d0;
+            border-top: none;
+            z-index: 1000; min-width: 220px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+        }
+        .mobile-menu.show {
+            opacity: 1; transform: translateY(0);
+            pointer-events: auto;
+        }
+        .mobile-menu-item {
+            display: block; width: 100%;
+            padding: 16px 22px;
+            font-size: 16px; font-weight: bold;
+            color: #333; background: none;
+            border: none;
+            border-bottom: 1px solid #e6d2ea;
+            text-align: left; cursor: pointer;
+        }
+        .mobile-menu-item:last-child { border-bottom: none; }
+        .mobile-menu-item:hover, .mobile-menu-item:active { background: #e4c7ea; }
+        .mobile-menu-item.active { color: #78328c; background: #eedbf2; }
+
+        .menu-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: 999;
+        }
+        .menu-overlay.show { display: block; }
+
+        main { width: 94%; max-width: 1250px; margin: 38px auto 70px; }
+        .section-title { margin: 0 0 18px; font-size: 30px; font-weight: bold; text-align: center; }
+
+        /* NEWS ARTICLES */
+        .news-box {
+            position: relative; width: 100%;
+            min-height: 240px; display: flex;
+            align-items: center; gap: 30px;
+            padding: 28px 32px 36px;
+            border: 4px solid #858585;
+            border-radius: 36px;
+            background: #f2d8f5;
+            box-shadow: 0 7px 22px rgba(120, 50, 140, 0.13);
+            margin-bottom: 32px;
+        }
+        .news-box:last-child {
+            margin-bottom: 0;
+        }
+        .news-content { flex: 1; min-width: 0; }
+        .news-title { margin: 0 0 22px; font-family: Georgia, serif; font-size: 31px; }
+        .news-text { margin: 0; font-size: 16px; line-height: 1.55; }
+        
+        /* PIN IN THE TOP RIGHT */
+        .pin-icon {
+            position: absolute;
+            top: 24px;
+            right: 28px;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .news-date {
+            position: absolute; bottom: 14px; right: 28px;
+            font-size: 14px; font-weight: bold; color: #444;
+        }
+
+        .mascot-wrap {
+            flex-shrink: 0; perspective: 400px;
+            cursor: default; pointer-events: auto;
+        }
+        .mascot {
+            width: 175px; height: auto; display: block;
+            transition: transform 0.08s ease-out;
+            transform-style: preserve-3d;
+            will-change: transform;
+            pointer-events: none;
+        }
+
+        .page { display: none; }
+        .page.active-page { display: block; }
+
+        /* RESTART BAR */
+        .game-controls {
+            width: 100%;
+            background: #f2d8f5;
+            border: 2px solid #c9a8d0;
+            border-bottom: none;
+            padding: 6px 14px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .ctrl-btn {
+            background: #f8eafa;
+            border: 1px solid #c9a8d0;
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .ctrl-btn:hover {
+            background: #e4c7ea;
+            border-color: #78328c;
+        }
+
+        /* GAME CONTAINERS */
+        .game-outer {
+            width: 100%; max-width: 1250px;
+            margin: 0 auto; position: relative;
+            background: #f8eafa;
+        }
+        .game-wrapper {
+            width: 100%;
+            border: 2px solid #c9a8d0;
+            background: #000;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+            position: relative;
+        }
+        .game-frame {
+            width: 100%; height: 100%;
+            border: none; display: block;
+        }
+
+        .fs-btn {
+            position: absolute;
+            top: 10px; right: 10px;
+            z-index: 20;
+            width: 40px; height: 40px;
+            background: rgba(248, 234, 250, 0.85);
+            border: 2px solid #c9a8d0;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .fs-btn:hover { background: #e4c7ea; }
+        .fs-btn svg {
+            width: 20px; height: 20px;
+            fill: #78328c; pointer-events: none;
+        }
+
+        /* FULLSCREEN STYLE */
+        .game-outer:fullscreen,
+        .game-outer:-webkit-full-screen {
+            width: 100vw !important;
+            height: 100vh !important;
+            background: #f8eafa !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .game-outer:fullscreen .game-controls,
+        .game-outer:-webkit-full-screen .game-controls {
+            width: 100%;
+            max-width: 1200px;
+            border-bottom: 2px solid #c9a8d0;
+            margin-bottom: 6px;
+        }
+        .game-outer:fullscreen .game-wrapper,
+        .game-outer:-webkit-full-screen .game-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            flex: 1;
+            aspect-ratio: unset;
+        }
+        .game-outer:fullscreen .fs-btn,
+        .game-outer:-webkit-full-screen .fs-btn {
+            top: 15px; right: 15px;
+            width: 44px; height: 44px;
+        }
+
+        .disclaimer-top {
+            width: 100%; max-width: 1250px;
+            margin: 0 auto 15px;
+            padding: 14px 20px;
+            background: #fff4b0;
+            border: 2px solid #c99700;
+            color: #6b4e00;
+            font-size: 15px; font-weight: bold;
+            text-align: center;
+        }
+        .disclaimer-side {
+            width: 100%; max-width: 1250px;
+            margin: 15px auto 0;
+            padding: 12px 18px;
+            background: #ffe0e0;
+            border: 2px solid #c0392b;
+            color: #7a2018;
+            font-size: 14px; text-align: center;
+        }
+        .disclaimer-list {
+            width: 100%; max-width: 1250px;
+            margin: 15px auto 0;
+            padding: 15px 20px;
+            background: #f8eafa;
+            border: 2px solid #c9a8d0;
+            color: #333; font-size: 14px;
+        }
+        .disclaimer-list ul {
+            margin: 8px 0 0 20px;
+            padding: 0; line-height: 1.7;
+        }
+        .mobile-block {
+            display: none;
+            width: 100%; max-width: 1250px;
+            margin: 0 auto;
+            padding: 40px 25px;
+            background: #ffe0e0;
+            border: 3px solid #c0392b;
+            color: #7a2018; text-align: center;
+        }
+        .mobile-block h2 {
+            font-family: Georgia, serif;
+            margin: 0 0 10px; color: #c0392b;
+        }
+        .mobile-block p { margin: 6px 0; font-size: 15px; font-weight: bold; }
+        .mobile-cat { width: 90px; margin-bottom: 12px; opacity: 0.6; }
+
+        .gucci-pop {
+            position: fixed;
+            bottom: -350px;
+            right: 30px;
+            width: 180px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .gucci-animate { animation: popUpAndDown 1s cubic-bezier(0.25,1,0.5,1) forwards; }
+        @keyframes popUpAndDown {
+            0% { bottom: -350px; }
+            25% { bottom: 30px; }
+            75% { bottom: 30px; }
+            100% { bottom: -350px; }
+        }
+
+        @media (max-width: 900px) {
+            .news-box { padding: 25px 25px 34px; gap: 20px; border-radius: 30px; }
+            .mascot { width: 140px; }
+        }
+        @media (max-width: 700px) {
+            header { min-height: 70px; padding: 7px 15px; }
+            .logo img { width: 47px; height: 47px; }
+            .logo-text { font-size: 25px; }
+            .logo-text sup { font-size: 10px; top: -9px; }
+            .lang-flag { width: 28px; height: 18px; }
+
+            .nav-tabs { display: none; }
+            .hamburger { display: flex; }
+            .mobile-menu { display: block; }
+
+            main { width: calc(100% - 24px); margin: 25px auto 45px; }
+            .section-title { font-size: 26px; }
+            .news-box { display: block; padding: 22px 20px 38px; border-width: 3px; border-radius: 25px; }
+            .news-title { font-size: 25px; }
+            .news-text { font-size: 15px; }
+            
+            .pin-icon {
+                top: 18px;
+                right: 20px;
+                font-size: 20px;
+            }
+
+            .news-date { bottom: 12px; right: 18px; font-size: 13px; }
+            .mascot-wrap { display: block; margin: 18px auto 0; width: fit-content; }
+            .mascot { width: 145px; margin: 0 auto; }
+            
+            .news-box > .mascot-wrap:first-child {
+                margin: 0 auto 18px !important;
+            }
+            .game-wrapper { aspect-ratio: 4 / 3; }
+
+            .pc-only-game { display: none !important; }
+            .mobile-block { display: block; }
+            
+            .gucci-pop {
+                width: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <img src="big_pink.png" alt="Gugatti Loading Cat" class="loading-cat">
+        <div class="loading-text" data-en="Loading..." data-it="Caricamento...">Loading...</div>
+    </div>
+
+    <!-- INVISIBLE SECRET AD TRIGGER AREA -->
+    <div id="secretTrigger" style="position:fixed;bottom:0;right:0;width:60px;height:60px;z-index:9998;cursor:default;"></div>
+    
+    <!-- ORIGINAL EASTER EGG POPUP -->
+    <img src="gucci.png" id="gucciImg" class="gucci-pop" alt="Gucci Easter Egg">
+
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <div class="page-content" id="pageContent">
+        <header>
+            <div class="header-left">
+                <div class="logo">
+                    <img src="big_pink.png" alt="Gugatti Mascot Logo">
+                    <span class="logo-text">Gugatti<sup>™</sup></span>
+                </div>
+                <!-- LANGUAGE FLAGS (CRISP SVGs) -->
+                <div class="lang-flags">
+                    <svg class="lang-flag active" id="flagEn" onclick="setLang('en')" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg" role="button" aria-label="English">
+                        <rect width="60" height="30" fill="#012169"/>
+                        <path d="M0,0 L60,30 M0,30 L60,0" stroke="#fff" stroke-width="6"/>
+                        <path d="M0,0 L30,15" stroke="#c8102e" stroke-width="4"/>
+                        <path d="M60,30 L30,15" stroke="#c8102e" stroke-width="4"/>
+                        <path d="M60,0 L30,15" stroke="#c8102e" stroke-width="4"/>
+                        <path d="M0,30 L30,15" stroke="#c8102e" stroke-width="4"/>
+                        <path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/>
+                        <path d="M30,0 V30 M0,15 H60" stroke="#c8102e" stroke-width="6"/>
+                    </svg>
+                    <svg class="lang-flag" id="flagIt" onclick="setLang('it')" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" role="button" aria-label="Italiano">
+                        <rect width="10" height="20" fill="#009246"/>
+                        <rect x="10" width="10" height="20" fill="#fff"/>
+                        <rect x="20" width="10" height="20" fill="#ce2b37"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <nav class="nav-tabs">
+                    <div class="nav-tab active" id="tabNews" onclick="switchTab('news')" data-en="News" data-it="Notizie">News</div>
+                    <div class="nav-tab" id="tabGame" onclick="switchTab('game')">Gugatti Jump</div>
+                    <div class="nav-tab" id="tabGame2" onclick="switchTab('game2')">Gugatti Jump 2</div>
+                    <div class="nav-tab" id="tabShooter" onclick="switchTab('shooter')" data-en="Gugatti Shooter" data-it="Gugatti Sparatutto">Gugatti Shooter</div>
+                </nav>
+
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+
+            <div class="mobile-menu" id="mobileMenu">
+                <button class="mobile-menu-item active" id="mobNews" onclick="switchTab('news'); closeMenu();" data-en="News" data-it="Notizie">News</button>
+                <button class="mobile-menu-item" id="mobGame" onclick="switchTab('game'); closeMenu();">Gugatti Jump</button>
+                <button class="mobile-menu-item" id="mobGame2" onclick="switchTab('game2'); closeMenu();">Gugatti Jump 2</button>
+                <button class="mobile-menu-item" id="mobShooter" onclick="switchTab('shooter'); closeMenu();" data-en="Gugatti Shooter" data-it="Gugatti Sparatutto">Gugatti Shooter</button>
+            </div>
+        </header>
+
+        <!-- NEWS -->
+        <main class="page active-page" id="pageNews">
+            <h1 class="section-title" id="newsTitle" data-en="NEWS:" data-it="NOTIZIE:">NEWS:</h1>
+            
+            <!-- Welcome Article (Pinned to Top) -->
+            <article class="news-box">
+                <span class="pin-icon">📍</span>
+                <div class="news-content">
+                    <h2 class="news-title" data-en="Welcome" data-it="Benvenuto">Welcome</h2>
+                    <p class="news-text" data-en="The official page of Gugatti™!" data-it="La pagina ufficiale di Gugatti™!">The official page of Gugatti™!</p>
+                </div>
+                <div class="mascot-wrap">
+                    <img src="big_pink.png" alt="Gugatti Cat 3D Mascot" class="mascot">
+                </div>
+                <time class="news-date" datetime="2026-10-02">02/10/2026</time>
+            </article>
+
+            <!-- Another New Game Article (07/10/2026 with Scratch Game Thumbnail) -->
+            <article class="news-box">
+                <div class="news-content">
+                    <h2 class="news-title" data-en="Another New Game" data-it="Un Altro Nuovo Gioco">Another New Game</h2>
+                    <p class="news-text" 
+                       data-en="Another game has been added! It supports mobile devices too! The game is mainly focused on defending a military base from demons, fighting them off with your trusty gun." 
+                       data-it="Un altro gioco è stato aggiunto! Supporta anche i dispositivi mobili! Il gioco è incentrato principalmente sulla difesa di una base militare dai demoni, respingendoli con la tua fidata pistola.">
+                       Another game has been added! It supports mobile devices too! The game is mainly focused on defending a military base from demons, fighting them off with your trusty gun.
+                    </p>
+                </div>
+                <div class="mascot-wrap">
+                    <img src="https://uploads.scratch.mit.edu/projects/thumbnails/1387747292.png" alt="Gugatti Military Defender Thumbnail" class="mascot">
+                </div>
+                <time class="news-date" datetime="2026-10-07">07/10/2026</time>
+            </article>
+
+            <!-- New Games Article (03/10/2026 with 2 Full Size Icons Left & Right) -->
+            <article class="news-box">
+                <!-- Icona 1 (Sinistra - Gugatti Jump 1) -->
+                <div class="mascot-wrap">
+                    <img src="https://uploads.scratch.mit.edu/projects/thumbnails/1387393887.png" alt="Gugatti Jump 1 Game Icon" class="mascot">
+                </div>
+                
+                <div class="news-content">
+                    <h2 class="news-title" data-en="NEW GAMES" data-it="NUOVI GIOCHI">NEW GAMES</h2>
+                    <p class="news-text" 
+                       data-en="New games have been added to the platform! Gugatti Jump 1 and Gugatti Jump 2, Gugatti Jump 2 is only for pc and doesn't support mobile devices, Have fun!" 
+                       data-it="Nuovi giochi sono stati aggiunti alla piattaforma! Gugatti Jump 1 e Gugatti Jump 2, Gugatti Jump 2 è solo per PC e non supporta i dispositivi mobili, Buon divertimento!">
+                       New games have been added to the platform! Gugatti Jump 1 and Gugatti Jump 2, Gugatti Jump 2 is only for pc and doesn't support mobile devices, Have fun!
+                    </p>
+                </div>
+                
+                <!-- Icona 2 (Destra - Gugatti Jump 2) -->
+                <div class="mascot-wrap">
+                    <img src="https://uploads.scratch.mit.edu/projects/thumbnails/1387393887.png" alt="Gugatti Jump 2 Game Icon" class="mascot">
+                </div>
+                <time class="news-date" datetime="2026-10-03">03/10/2026</time>
+            </article>
+        </main>
+
+        <!-- GUGATTI JUMP -->
+        <main class="page" id="pageGame">
+            <h1 class="section-title">GUGATTI JUMP</h1>
+
+            <div class="game-outer" id="gameOuter1">
+                <!-- CONTROLS -->
+                <div class="game-controls">
+                    <button class="ctrl-btn" onclick="reloadGame('frameGame')" data-en="Restart" data-it="Riavvia">Restart</button>
+                </div>
+
+                <div class="game-wrapper" id="gameWrapper">
+                    <iframe src="gugatti_jump.html" id="frameGame" class="game-frame" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen title="Gugatti Jump Game"></iframe>
+                    <button class="fs-btn" id="fsBtn" title="Fullscreen">
+                        <svg id="fsExpand" viewBox="0 0 24 24"><path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 15h2v4h4v2H3v-6zm16 0h2v6h-6v-2h4v-4z"/></svg>
+                        <svg id="fsShrink" viewBox="0 0 24 24" style="display:none;"><path d="M9 3v4H5v2h6V3H9zm6 0v6h6V7h-4V3h-2zM5 15h4v6h2v-8H5v2zm10 0v6h2v-4h4v-2h-6z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- GUGATTI JUMP 2 -->
+        <main class="page" id="pageGame2">
+            <h1 class="section-title">GUGATTI JUMP 2</h1>
+
+            <div class="disclaimer-top" data-en="⚠️ WARNING: This game is designed for PC / Desktop ONLY. It will NOT work on mobile devices." data-it="⚠️ ATTENZIONE: Questo gioco è progettato SOLO per PC / Desktop. NON funzionerà su dispositivi mobili.">
+                ⚠️ WARNING: This game is designed for PC / Desktop ONLY. It will NOT work on mobile devices.
+            </div>
+
+            <div class="mobile-block">
+                <img src="big_pink.png" alt="Gugatti Cat Warning" class="mobile-cat">
+                <h2 data-en="PC Required" data-it="Richiesto PC">PC Required</h2>
+                <p data-en="Gugatti Jump 2 cannot be played on mobile devices." data-it="Gugatti Jump 2 non può essere giocato su dispositivi mobili.">Gugatti Jump 2 cannot be played on mobile devices.</p>
+                <p data-en="Please open this page on a Windows, Mac, or Linux computer." data-it="Apri questa pagina su un computer Windows, Mac o Linux.">Please open this page on a Windows, Mac, or Linux computer.</p>
+                <p data-en="A keyboard and mouse are required to play." data-it="Per giocare servono tastiera e mouse.">A keyboard and mouse are required to play.</p>
+            </div>
+
+            <div class="pc-only-game">
+                <div class="game-outer" id="gameOuter2">
+                    <!-- CONTROLS -->
+                    <div class="game-controls">
+                        <button class="ctrl-btn" onclick="reloadGame('frameGame2')" data-en="Restart" data-it="Riavvia">Restart</button>
+                    </div>
+
+                    <div class="game-wrapper" id="gameWrapper2">
+                        <iframe src="Gugatti_jump_2.html" id="frameGame2" class="game-frame" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen title="Gugatti Jump 2 Game"></iframe>
+                        <button class="fs-btn" id="fsBtn2" title="Fullscreen">
+                            <svg id="fsExpand2" viewBox="0 0 24 24"><path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 15h2v4h4v2H3v-6zm16 0h2v6h-6v-2h4v-4z"/></svg>
+                            <svg id="fsShrink2" viewBox="0 0 24 24" style="display:none;"><path d="M9 3v4H5v2h6V3H9zm6 0v6h6V7h-4V3h-2zM5 15h4v6h2v-8H5v2zm10 0v6h2v-4h4v-2h-6z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="disclaimer-side" data-en="❗ Reminder: If you are seeing this on a phone or tablet, the game will NOT function properly." data-it="❗ Promemoria: Se stai vedendo questo su un telefono o tablet, il gioco NON funzionerà correttamente.">
+                    ❗ Reminder: If you are seeing this on a phone or tablet, the game will NOT function properly.
+                </div>
+
+                <div class="disclaimer-list">
+                    <strong data-en="Important Notes:" data-it="Note Importanti:">Important Notes:</strong>
+                    <ul>
+                        <li data-en="This game requires a PC / Desktop computer." data-it="Questo gioco richiede un PC / computer desktop.">This game requires a PC / Desktop computer.</li>
+                        <li data-en="A physical keyboard is required to play." data-it="Per giocare è necessaria una tastiera fisica.">A physical keyboard is required to play.</li>
+                        <li data-en="A mouse is strongly recommended." data-it="Si consiglia vivamente l'uso del mouse.">A mouse is strongly recommended.</li>
+                        <li data-en="Touch controls are NOT supported." data-it="I controlli touch NON sono supportati.">Touch controls are NOT supported.</li>
+                        <li data-en="Mobile browsers and tablets are not officially supported." data-it="Browser mobili e tablet non sono ufficialmente supportati.">Mobile browsers and tablets are not officially supported.</li>
+                        <li data-en="For the best experience, use fullscreen mode." data-it="Per la migliore esperienza, usa la modalità schermo intero.">For the best experience, use fullscreen mode.</li>
+                        <li data-en="If the game does not load correctly, try refreshing or using Chrome, Firefox, or Edge." data-it="Se il gioco non si carica, prova ad aggiornare o usa Chrome, Firefox o Edge.">If the game does not load correctly, try refreshing or using Chrome, Firefox, or Edge.</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <!-- GUGATTI SHOOTER -->
+        <main class="page" id="pageShooter">
+            <h1 class="section-title">GUGATTI SHOOTER</h1>
+            
+            <div class="game-outer" id="gameOuter3">
+                <!-- CONTROLS -->
+                <div class="game-controls">
+                    <button class="ctrl-btn" onclick="reloadGame('frameShooter')" data-en="Restart" data-it="Riavvia">Restart</button>
+                </div>
+
+                <div class="game-wrapper" id="gameWrapper3">
+                    <iframe src="gugatti_shooter.html" id="frameShooter" class="game-frame" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen title="Gugatti Shooter Game"></iframe>
+                    <button class="fs-btn" id="fsBtn3" title="Fullscreen">
+                        <svg id="fsExpand3" viewBox="0 0 24 24"><path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 15h2v4h4v2H3v-6zm16 0h2v6h-6v-2h4v-4z"/></svg>
+                        <svg id="fsShrink3" viewBox="0 0 24 24" style="display:none;"><path d="M9 3v4H5v2h6V3H9zm6 0v6h6V7h-4V3h-2zM5 15h4v6h2v-8H5v2zm10 0v6h2v-4h4v-2h-6z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        /* LOADING */
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(function() {
+                var ls = document.getElementById("loadingScreen");
+                var pc = document.getElementById("pageContent");
+                if (ls) ls.classList.add("fade-out");
+                if (pc) pc.classList.add("visible");
+                setTimeout(function() {
+                    if (ls) ls.style.display = "none";
+                }, 400);
+            }, 1200);
+
+            if (safeGetStorage("gucciPopped", "") === "true") {
+                var t = document.getElementById("secretTrigger");
+                if (t) t.remove();
+            }
+        });
+
+        /* RESTART GAME FUNCTION */
+        function reloadGame(frameId) {
+            var frame = document.getElementById(frameId);
+            if (frame) {
+                frame.src = frame.src;
+            }
+        }
+
+        /* AUDIO SYNTH FOR EASTER EGG */
+        function playPopSound() {
+            try {
+                var AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                var ctx = new AudioContext();
+                var osc = ctx.createOscillator();
+                var gain = ctx.createGain();
+
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(320, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(950, ctx.currentTime + 0.16);
+
+                gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.22);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc.stop(ctx.currentTime + 0.22);
+            } catch(e) {}
+        }
+
+        /* EASTER EGG TRIGGER */
+        document.getElementById("secretTrigger").addEventListener("click", function() {
+            var newsPage = document.getElementById("pageNews");
+            if (newsPage && newsPage.classList.contains("active-page")) {
+                safeSetStorage("gucciPopped", "true");
+                var gucci = document.getElementById("gucciImg");
+                if (gucci) {
+                    gucci.classList.add("gucci-animate");
+                    playPopSound();
+                }
+                this.remove();
+            }
+        });
+
+        /* LANGUAGE SYSTEM */
+        var currentLang = "en";
+
+        function safeGetStorage(key, defaultVal) {
+            try {
+                var v = localStorage.getItem(key);
+                return v !== null ? v : defaultVal;
+            } catch (e) {
+                return defaultVal;
+            }
+        }
+
+        function safeSetStorage(key, val) {
+            try {
+                localStorage.setItem(key, val);
+            } catch (e) {}
+        }
+
+        function setLang(lang) {
+            if (lang !== "en" && lang !== "it") lang = "en";
+            currentLang = lang;
+            safeSetStorage("gugattiLang", lang);
+
+            var flagEn = document.getElementById("flagEn");
+            var flagIt = document.getElementById("flagIt");
+            if (flagEn) flagEn.classList.toggle("active", lang === "en");
+            if (flagIt) flagIt.classList.toggle("active", lang === "it");
+
+            document.documentElement.lang = lang;
+
+            var els = document.querySelectorAll("[data-en][data-it]");
+            for (var i = 0; i < els.length; i++) {
+                var el = els[i];
+                var txt = el.getAttribute("data-" + lang);
+                if (txt !== null && txt !== undefined) {
+                    el.innerHTML = txt;
+                }
+            }
+
+            var fsBtns = document.querySelectorAll(".fs-btn");
+            for (var j = 0; j < fsBtns.length; j++) {
+                fsBtns[j].setAttribute("title", lang === "it" ? "Schermo intero" : "Fullscreen");
+            }
+
+            updateTitle();
+        }
+
+        function updateTitle() {
+            var active = document.querySelector(".page.active-page");
+            if (!active) return;
+            var id = active.id;
+            
+            // LA SCHEDA PRINCIPALE HA SEMPRE TITOLO "Gugatti"
+            if (id === "pageNews") {
+                document.title = "Gugatti";
+            } else if (currentLang === "it") {
+                if (id === "pageGame") document.title = "Gugatti™ | Gugatti Jump";
+                else if (id === "pageGame2") document.title = "Gugatti™ | Gugatti Jump 2";
+                else if (id === "pageShooter") document.title = "Gugatti™ | Gugatti Sparatutto";
+            } else {
+                if (id === "pageGame") document.title = "Gugatti™ | Gugatti Jump";
+                else if (id === "pageGame2") document.title = "Gugatti™ | Gugatti Jump 2";
+                else if (id === "pageShooter") document.title = "Gugatti™ | Gugatti Shooter";
+            }
+        }
+
+        /* INITIAL LOAD SIGNALS */
+        document.addEventListener("DOMContentLoaded", function() {
+            var saved = safeGetStorage("gugattiLang", null);
+            if (!saved) {
+                var navLang = (navigator.language || navigator.userLanguage || "").toLowerCase();
+                saved = navLang.startsWith("it") ? "it" : "en";
+            }
+            setLang(saved);
+        });
+
+        /* HAMBURGER */
+        var hamburger = document.getElementById("hamburger");
+        var mobileMenu = document.getElementById("mobileMenu");
+        var menuOverlay = document.getElementById("menuOverlay");
+        var menuOpen = false;
+
+        function openMenu() {
+            menuOpen = true;
+            if (hamburger) hamburger.classList.add("open");
+            if (mobileMenu) mobileMenu.classList.add("show");
+            if (menuOverlay) menuOverlay.classList.add("show");
+        }
+        function closeMenu() {
+            menuOpen = false;
+            if (hamburger) hamburger.classList.remove("open");
+            if (mobileMenu) mobileMenu.classList.remove("show");
+            if (menuOverlay) menuOverlay.classList.remove("show");
+        }
+        if (hamburger) {
+            hamburger.addEventListener("click", function(e) {
+                e.stopPropagation();
+                if (menuOpen) closeMenu(); else openMenu();
+            });
+        }
+        if (menuOverlay) menuOverlay.addEventListener("click", closeMenu);
+
+        /* TABS */
+        function switchTab(tab) {
+            var pages = {
+                news: document.getElementById("pageNews"),
+                game: document.getElementById("pageGame"),
+                game2: document.getElementById("pageGame2"),
+                shooter: document.getElementById("pageShooter")
+            };
+            var tabs = {
+                news: document.getElementById("tabNews"),
+                game: document.getElementById("tabGame"),
+                game2: document.getElementById("tabGame2"),
+                shooter: document.getElementById("tabShooter")
+            };
+            var mobs = {
+                news: document.getElementById("mobNews"),
+                game: document.getElementById("mobGame"),
+                game2: document.getElementById("mobGame2"),
+                shooter: document.getElementById("mobShooter")
+            };
+
+            for (var k in pages) {
+                if (pages[k]) pages[k].classList.remove("active-page");
+                if (tabs[k]) tabs[k].classList.remove("active");
+                if (mobs[k]) mobs[k].classList.remove("active");
+            }
+
+            if (pages[tab]) pages[tab].classList.add("active-page");
+            if (tabs[tab]) tabs[tab].classList.add("active");
+            if (mobs[tab]) mobs[tab].classList.add("active");
+
+            updateTitle();
+        }
+
+        /* FULLSCREEN SYSTEM */
+        function setupFullscreen(wrapperId, btnId, expandId, shrinkId) {
+            var wrapper = document.getElementById(wrapperId);
+            var btn = document.getElementById(btnId);
+            var expandIcon = document.getElementById(expandId);
+            var shrinkIcon = document.getElementById(shrinkId);
+            if (!wrapper || !btn) return;
+
+            function isFS() {
+                return !!(document.fullscreenElement || document.webkitFullscreenElement);
+            }
+            function enterFS() {
+                if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+                else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+            }
+            function exitFS() {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+            function updateIcon() {
+                var active = document.fullscreenElement === wrapper || document.webkitFullscreenElement === wrapper;
+                if (expandIcon) expandIcon.style.display = active ? "none" : "block";
+                if (shrinkIcon) shrinkIcon.style.display = active ? "block" : "none";
+            }
+            btn.addEventListener("click", function(e) {
+                e.preventDefault(); e.stopPropagation();
+                if (isFS()) exitFS(); else enterFS();
+            });
+            document.addEventListener("fullscreenchange", updateIcon);
+            document.addEventListener("webkitfullscreenchange", updateIcon);
+        }
+        setupFullscreen("gameOuter1", "fsBtn", "fsExpand", "fsShrink");
+        setupFullscreen("gameOuter2", "fsBtn2", "fsExpand2", "fsShrink2");
+        setupFullscreen("gameOuter3", "fsBtn3", "fsExpand3", "fsShrink3");
+
+        /* MULTI-INSTANCE 3D TILT EFFECT */
+        (function() {
+            var wraps = document.querySelectorAll(".mascot-wrap");
+            var maxTilt = 45;
+
+            wraps.forEach(function(wrap) {
+                var mascot = wrap.querySelector(".mascot");
+                if (!mascot) return;
+
+                wrap.addEventListener("mousemove", function(e) {
+                    var rect = wrap.getBoundingClientRect();
+                    var x = (e.clientX - rect.left) / rect.width;
+                    var y = (e.clientY - rect.top) / rect.height;
+                    var px = (x - 0.5) * 2;
+                    var py = (y - 0.5) * 2;
+
+                    mascot.style.transform =
+                        "rotateX(" + (-py * maxTilt).toFixed(1) + "deg) " +
+                        "rotateY(" + (px * maxTilt).toFixed(1) + "deg) " +
+                        "scale3d(1.05, 1.05, 1.05)";
+                });
+
+                wrap.addEventListener("mouseleave", function() {
+                    mascot.style.transition = "transform 0.4s ease-out";
+                    mascot.style.transform = "rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+                    setTimeout(function() { mascot.style.transition = "transform 0.08s ease-out"; }, 400);
+                });
+
+                wrap.addEventListener("mouseenter", function() {
+                    mascot.style.transition = "transform 0.08s ease-out";
+                });
+            });
+
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener("deviceorientation", function(e) {
+                    if (e.gamma === null || e.beta === null) return;
+                    var rotY = Math.max(-maxTilt, Math.min(maxTilt, e.gamma * 0.8));
+                    var rotX = Math.max(-maxTilt, Math.min(maxTilt, (e.beta - 45) * 0.6));
+                    
+                    var mascots = document.querySelectorAll(".mascot");
+                    mascots.forEach(function(mascot) {
+                        mascot.style.transform =
+                            "rotateX(" + rotX.toFixed(1) + "deg) " +
+                            "rotateY(" + rotY.toFixed(1) + "deg)";
+                    });
+                });
+            }
+        })();
+
+        /* PROTECTION */
+        document.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+        document.addEventListener("selectstart", function(e) { e.preventDefault(); });
+        document.addEventListener("dragstart", function(e) { e.preventDefault(); });
+        document.addEventListener("keydown", function(e) {
+            if ((e.ctrlKey || e.metaKey) && "cus".indexOf(e.key.toLowerCase()) > -1) e.preventDefault();
+        });
+    </script>
+</body>
+</html>
